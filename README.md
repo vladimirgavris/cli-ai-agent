@@ -10,6 +10,17 @@ Day 1: project structure, dependencies, startup CLI, and first tests.
 
 uv sync
 
+## Environment variables
+
+Copy .env.example to .env and add OPENAI_API_KEY.
+The project uses gpt-5.6-luna.
+Never commit the real .env file.
+
+## Day 2 status
+
+The CLI sends one user question to OpenAI Responses API and prints the response.
+Conversation memory comes next.
+
 ## Run
 
 uv run python -m cli_ai_agent.cli
