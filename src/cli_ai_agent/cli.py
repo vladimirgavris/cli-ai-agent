@@ -1,7 +1,10 @@
+import argparse
+from functools import partial
 from pathlib import Path
 
 from openai import APIConnectionError, APIStatusError, AuthenticationError
 from rich.console import Console
+from rich.text import Text
 
 from cli_ai_agent.agent import Agent
 from cli_ai_agent.history import Conversation
@@ -11,12 +14,28 @@ def print_error( console: Console, error: Exception ) -> None:
 
     if isinstance( error, AuthenticationError ):
         console.print( "[red]Authentication failed. Check .env without sharing the key.[/red]" )
+
     elif isinstance( error, APIConnectionError ):
         console.print( "[red]Could not reach the API. Check your internet connection.[/red]" )
-    elif isinstance(error, APIStatusError):
-        console.print( f"[red]OpenAI API error: {error.status_code}[/red]" )
+
+    elif isinstance( error, APIStatusError ):
+        console.print( f"[red]OpenAI API error: { error.status_code }[/red]" )
+
     else:
-        console.print( f"[red]{error}[/red]" )
+        console.print( f"[red]{ error }[/red]" )
+
+
+def print_tool_trace(
+    console: Console,
+    name: str,
+    arguments_json: str,
+    output: str,
+) -> None:
+    console.print( f"\n[bold magenta]Tool > { name }[/bold magenta]" )
+    console.print( "[magenta]Input[/magenta]" )
+    console.print( Text( arguments_json ) )
+    console.print( "[magenta]Output[/magenta]" )
+    console.print( Text( output ) )
 
 
 def choose_conversation( console: Console ) -> Conversation:
@@ -26,19 +45,37 @@ def choose_conversation( console: Console ) -> Conversation:
 
     if file_path:
         conversation = Conversation.load( Path( file_path ) )
-        console.print( f"[cyan]Loaded: {conversation.file_path}[/cyan]" )
+        console.print( f"[cyan]Loaded: { conversation.file_path }[/cyan]" )
         return conversation
 
     conversation = Conversation.create_new( )
-    console.print( f"[cyan]New conversation: {conversation.file_path}[/cyan]" )
+    console.print( f"[cyan]New conversation: { conversation.file_path }[/cyan]" )
     return conversation
 
 
-def main( ) -> None:
+def main() -> None:
+    parser = argparse.ArgumentParser( description = "Chat with the CLI knowledge agent." )
+    parser.add_argument(
+        "--show-tools",
+        action="store_true",
+        help="show each tool name, input, and output",
+    )
+    args = parser.parse_args( )
+
     console = Console( )
-    console.print( "[bold cyan]CLI AI Agent[/bold cyan]" )
+
+    # Passing no callback keeps tool tracing disabled by default.
+    tool_trace = partial( print_tool_trace, console ) if args.show_tools else None
+    console.print( "[bold cyan]CLI Knowledge Agent[/bold cyan]" )
     conversation = choose_conversation( console )
-    agent = Agent( conversation )
+
+    agent = Agent( conversation, tool_trace=tool_trace )
+    console.print(
+        "Ask about the local knowledge files. The agent will inspect the index before reading."
+    )
+
+    if args.show_tools:
+        console.print( "[magenta]Tool tracing enabled.[/magenta]" )
     console.print( "Commands: /reset starts a new JSON conversation, /quit exits." )
 
     while True:
@@ -50,7 +87,7 @@ def main( ) -> None:
 
         if user_message == "/reset":
             conversation = Conversation.create_new( )
-            agent = Agent( conversation )
+            agent = Agent(conversation, tool_trace=tool_trace)
             console.print( f"[yellow]New conversation: {conversation.file_path}[/yellow]" )
             continue
 
@@ -59,8 +96,17 @@ def main( ) -> None:
             continue
 
         try:
-            answer = agent.reply( user_message )
-        except Exception as error:
+            with console.status( "[cyan]Checking local knowledge when needed...[/cyan]" ):
+                answer = agent.reply( user_message )
+        except (
+            AuthenticationError,
+            APIConnectionError,
+            APIStatusError,
+            RuntimeError,
+            OSError,
+            TypeError,
+            ValueError,
+        ) as error:
             print_error( console, error )
             continue
 

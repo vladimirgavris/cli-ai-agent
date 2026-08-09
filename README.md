@@ -4,8 +4,9 @@ A local command-line AI agent built during an internship.
 
 ## Current status
 
-The CLI sends one user question to OpenAI Responses API and prints the response.
-Conversation memory comes next.
+The CLI sends one user question to OpenAI Responses API and prints the response. It saves each conversation as a JSON file in 'conversations/'. At startup, paste a previous JSON path to continue the conversation, or press Enter to start a new one. Use '/reset' to create a new conversation and '/quit' to exit. The conversation files are ignored by Git.
+
+The CLI can use local files in 'knowledge/' through controlled tools. The tool code blocks paths outide 'knowledge/' and only allows '.md' and '.txt' files. Pass '--show-tools' to display each tool's name, JSON input, and output.
 
 ## Roadmap
 
@@ -29,3 +30,6 @@ Never commit the real .env file.
 ### Run
 
 uv run python -m cli_ai_agent.cli
+
+### Optional tool-call tracing
+uv run python -m cli_ai_agent.cli --show-tools
