@@ -12,14 +12,14 @@ ToolTrace = Callable[ [ str, str, str ], None ]
 
 SYSTEM_PROMPT = (
     "You are a helpful CLI knowledge agent for a 12th-grade student. "
-    "Use local file tools for questions about this project's documented Git, GitHub, "
-    "uv, OpenAI API, or troubleshooting information. "
+    "Use local file tools for questions you don't have the answer to. "
     "For these questions, call list_files first, then read index.md, then read only "
     "the document or documents relevant to the question. "
     "For greetings, casual conversation, or questions unrelated to the local project "
     "knowledge, answer directly without calling a file tool. "
     "Answer local-knowledge questions only from files you actually read. "
-    "If the index or relevant files do not contain the answer, say so clearly; do not invent it. "
+    "If a question requires an external tool, and the index or the files do not contain said information, "
+    "Say so clearly; do not attempt to invent an answer."
     "If a tool returns an error, use the error to correct the next step and do not repeat "
     "the identical call. "
     "Preserve commands, file paths, package names, and code identifiers exactly as written."
@@ -32,9 +32,7 @@ TOOLS: list[ dict[ str, Any ] ] = [
         "type": "function",
         "name": "list_files",
         "description": (
-            "List allowed local knowledge files. Use first for questions about the "
-            "project's documented Git, GitHub, uv, OpenAI API, or troubleshooting information. "
-            "After this, read index.md before another knowledge file. "
+            "List allowed local knowledge files. Check if you do not have the answer to a question and it may be found here." 
             "Do not use for greetings, casual conversation, or unrelated general questions."
         ),
         "strict": True,

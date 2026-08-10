@@ -53,12 +53,12 @@ def choose_conversation( console: Console ) -> Conversation:
     return conversation
 
 
-def main() -> None:
+def main( ) -> None:
     parser = argparse.ArgumentParser( description = "Chat with the CLI knowledge agent." )
     parser.add_argument(
         "--show-tools",
-        action="store_true",
-        help="show each tool name, input, and output",
+        action = "store_true",
+        help = "show each tool name, input, and output",
     )
     args = parser.parse_args( )
 
