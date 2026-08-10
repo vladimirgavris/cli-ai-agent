@@ -1,49 +1,148 @@
+import json
+from collections.abc import Callable
+from typing import Any
+
 from openai import OpenAI
 
 from cli_ai_agent.config import MODEL_NAME, get_openai_api_key
 from cli_ai_agent.history import Conversation
+from cli_ai_agent.tools import list_files, read_file
+
+ToolTrace = Callable[ [ str, str, str ], None ]
 
 SYSTEM_PROMPT = (
-    "You are a helpful assistant inside a command-line AI agent. "
-    "Reply in the language and in the format requested by the user; preserve commands, file paths, "
-    "package names, and code identifiers exactly as written. "
-    "Lead with the direct answer, then add only the detail needed to take the next step. "
-    "If information required for a safe or accurate answer is missing, say what is "
-    "missing and ask one focused question. Never invent commands, files, or results. "
-    "If you are unable to fulfill a request, apologize and explain why, offer an alternative. "
-    "Do not deliver answers which confuse the user. For example: if you cannot comply with a format request, "
-    "do not send an empty message, explain that you can't fulfill the request. "
-    "When a request has more than one reasonable interpretation, pick the most natural "
-    "interpretation, state that assumption in one short line, and then produce the full output — "
-    "do not withhold the output while you resolve the ambiguity. Every response must contain "
-    "visible content; an empty response is never acceptable."
+    "You are a helpful CLI knowledge agent for a 12th-grade student. "
+    "Use local file tools for questions you don't have the answer to. "
+    "For these questions, call list_files first, then read index.md, then read only "
+    "the document or documents relevant to the question. "
+    "For greetings, casual conversation, or questions unrelated to the local project "
+    "knowledge, answer directly without calling a file tool. "
+    "Answer local-knowledge questions only from files you actually read. "
+    "If a question requires an external tool, and the index or the files do not contain said information, "
+    "Say so clearly; do not attempt to invent an answer."
+    "If a tool returns an error, use the error to correct the next step and do not repeat "
+    "the identical call. "
+    "Preserve commands, file paths, package names, and code identifiers exactly as written."
 )
 
-class Agent:
-    ### Sends a persisted conversation transcript to the Responses API.
 
-    def __init__( self, conversation: Conversation ) -> None:
+
+TOOLS: list[ dict[ str, Any ] ] = [
+    {
+        "type": "function",
+        "name": "list_files",
+        "description": (
+            "List allowed local knowledge files. Check if you do not have the answer to a question and it may be found here." 
+            "Do not use for greetings, casual conversation, or unrelated general questions."
+        ),
+        "strict": True,
+        "parameters": {
+            "type": "object",
+            "properties": { },
+            "required": [ ],
+            "additionalProperties": False,
+        },
+    },
+    {
+        "type": "function",
+        "name": "read_file",
+        "description": (
+            "Read one file directly inside knowledge/. Use only after list_files and "
+            "after reading index.md. Pass an exact file name returned by list_files. "
+            "Do not use for general conversation or to access files outside knowledge/."
+        ),
+        "strict": True,
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Exact file name returned by list_files, such as index.md.",
+                }
+            },
+            "required": [ "name" ],
+            "additionalProperties": False,
+        },
+    },
+]
+
+
+class Agent:
+    ###Answers with a persisted transcript and controlled local file tools.
+
+    def __init__(
+        self,
+        conversation: Conversation,
+        tool_trace: ToolTrace | None = None,
+    ) -> None:
         self.client = OpenAI( api_key = get_openai_api_key( ) )
         self.conversation = conversation
+        self.tool_trace = tool_trace
 
     def reply( self, user_message: str ) -> str:
         self.conversation = Conversation.load( self.conversation.file_path )
         self.conversation.append( "user", user_message )
         self.conversation.save( )
 
+        #Copy the visible transcript: tool-call items stay internal to this turn.
+        tool_input = list( self.conversation.to_openai_input( ) )
         response = self.client.responses.create(
             model = MODEL_NAME,
             instructions = SYSTEM_PROMPT,
-            input=self.conversation.to_openai_input( ),
-            max_output_tokens = 1000,
+            input = tool_input,
+            tools = TOOLS,
+            parallel_tool_calls = False,
+            max_output_tokens = 400,
         )
 
-        answer = response.output_text
+        while function_calls := [
+            item for item in response.output if item.type == "function_call"
+        ]:
+            tool_outputs = [
+                {
+                    "type": "function_call_output",
+                    "call_id": call.call_id,
+                    "output": self._run_tool_with_trace( call.name, call.arguments ),
+                }
+                for call in function_calls
+            ]
+            tool_input.extend( response.output )
+            tool_input.extend( tool_outputs )
+            response = self.client.responses.create(
+                model = MODEL_NAME,
+                instructions = SYSTEM_PROMPT,
+                input = tool_input,
+                tools = TOOLS,
+                parallel_tool_calls = False,
+                max_output_tokens = 400,
+            )
 
-        if not answer.strip( ):
-            print( "EMPTY RESPONSE DEBUG: ", response )
-            answer = "I'm sorry, I could not fulfill this request."
-        else:
-            self.conversation.append( "assistant", answer )
-            self.conversation.save( )
+        answer = response.output_text
+        self.conversation.append( "assistant", answer )
+        self.conversation.save( )
         return answer
+
+    def _run_tool_with_trace( self, name: str, arguments_json: str ) -> str:
+        output = self._run_tool( name, arguments_json )
+
+        # The CLI supplies this callback only when --show-tools is enabled.
+        if self.tool_trace is not None:
+            self.tool_trace( name, arguments_json, output )
+        return output
+
+    @staticmethod
+    def _run_tool( name: str, arguments_json: str ) -> str:
+        try:
+            arguments = json.loads( arguments_json )
+        except json.JSONDecodeError:
+            return "Tool error: arguments were not valid JSON."
+
+        if name == "list_files":
+            return json.dumps( { "files": list_files( ) } )
+        if name == "read_file":
+            file_name = arguments.get( "name" )
+            if not isinstance( file_name, str ):
+                return "Tool error: read_file requires a string name."
+            return read_file( file_name )
+
+        return f"Tool error: unknown tool { name!r }."
