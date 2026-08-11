@@ -1,0 +1,3 @@
+Neck Construction
+
+Necks are built as either bolt-on, set-neck (glued), or neck-through-body designs. Common woods: maple (bright, stable) and mahogany (warm, resonant). A truss rod channel is routed before the fretboard is glued on, allowing later adjustment of neck relief (slight forward bow) using an Allen key at the headstock or heel. Neck profiles (C, U, V shapes) affect hand feel but not tone significantly.

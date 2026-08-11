@@ -1,0 +1,3 @@
+Fretboard & Scale Length
+
+Scale length is the distance from nut to bridge; it sets string tension and fret spacing. Common scales: 24.75" (Gibson-style, looser feel) and 25.5" (Fender-style, tighter, brighter tone). Fret spacing follows the 12th-root-of-2 rule so each fret raises pitch by a half-step. Fretboard woods: rosewood (warm, oily) and maple (bright, harder finish, shows wear). Radius (fretboard curvature) is usually 7.25"–16"; flatter radii suit low action and bending.

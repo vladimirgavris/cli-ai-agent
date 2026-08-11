@@ -1,0 +1,3 @@
+Bridge & Tailpiece Types
+
+Fixed bridge: strings anchor directly, simple and tuning-stable. Tremolo (vibrato) bridge: spring-tensioned, allows pitch bending, needs more tuning maintenance. Tune-o-matic: adjustable bridge (per-string intonation) paired with a separate stopbar tailpiece, common on Gibson-style guitars. Floating bridge: used on archtop/acoustic guitars, held in place by string tension alone, not screwed down.

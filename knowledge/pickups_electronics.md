@@ -1,0 +1,3 @@
+Pickups & Electronics
+
+Single-coil pickups: bright, articulate, but prone to 60-cycle hum. Humbuckers: two coils wired to cancel hum, output thicker warmer tone. Passive pickups need no battery; active pickups use a preamp and require one (usually 9V). Potentiometers control volume and tone; tone pots pair with a capacitor to roll off high frequencies. Pickup height (distance to strings) affects output and can cause magnetic pull on strings if too close.

@@ -1,0 +1,3 @@
+Hollow & Semi-Hollow Bodies
+
+Hollow body: fully hollow chambered body with top, back, and sides glued together like an acoustic; prone to feedback at high volume, warm resonant tone. Semi-hollow: hollow wings around a solid center block running through the body, reducing feedback while keeping some acoustic resonance. F-holes (or soundholes) let the body resonate and vent internal air pressure. Archtop construction uses a carved or pressed arched top/back rather than a flat one, common on jazz-style hollow bodies. Chambered solid body: mostly solid wood with hollowed-out cavities under the top, lighter weight, subtler resonance than true hollow/semi-hollow.

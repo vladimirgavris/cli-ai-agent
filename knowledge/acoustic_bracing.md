@@ -1,0 +1,3 @@
+Acoustic Bracing Patterns
+
+Bracing reinforces the top (soundboard) against string tension while letting it vibrate. X-bracing: two braces crossing below the soundhole; standard on steel-string guitars, gives strong bass and volume. Fan bracing: braces radiate outward; used on classical (nylon-string) guitars for a softer, balanced tone. Scalloped bracing: braces are carved thinner between glue points, increasing top flexibility and volume, at some cost to structural strength.

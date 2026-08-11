@@ -1,0 +1,3 @@
+Setup & Intonation
+
+String action: height of strings above frets, adjusted at bridge (and nut slots). Intonation: adjusting saddle position so the 12th-fret harmonic matches the fretted 12th-fret note; corrects pitch across the neck. Neck relief is set via truss rod before action is set, since relief affects buzzing and playability. String gauge changes affect the tension needed and may require truss rod and intonation readjustment.
