@@ -113,6 +113,15 @@ def main( ) -> None:
         console.print( "\n[bold cyan]Agent >[/bold cyan]" )
         console.print( answer )
 
+        # New in Day 5: sources recorded by the code, not claimed by the model.
+        if agent.last_read_files:
+            sources = ", ".join( dict.fromkeys(agent.last_read_files ) )
+            console.print( f"[dim]Files read: {sources}[/dim]" )
+        else:
+            console.print( "[dim]No local files read for this answer.[/dim]" )
+
+        console.print( f"[dim]Tokens used this turn: {agent.last_total_tokens}[/dim]" )
+
 
 if __name__ == "__main__":
     main()

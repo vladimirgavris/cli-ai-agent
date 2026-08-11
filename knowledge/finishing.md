@@ -1,0 +1,3 @@
+Finishing
+
+Nitrocellulose lacquer: thin, vintage tone-friendly, but fragile and slow-curing. Polyurethane: durable, thick, faster to apply, common on budget/production guitars. Oil finishes (tung/danish oil): natural feel, easy to repair, minimal protection. Grain filling is done before finishing on open-pore woods like mahogany to create a smooth surface. Finish is typically sanded and buffed in stages up to a high-gloss or satin sheen.

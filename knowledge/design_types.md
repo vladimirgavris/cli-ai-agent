@@ -1,0 +1,3 @@
+Body Design Types
+
+Solid body: single-piece or glued-up slab of wood, no internal cavities besides electronics/wiring routes; sustains long, resists feedback. Semi-hollow / hollow: see dedicated file; balances resonance with feedback control. Offset body: asymmetrical shape (e.g. Jazzmaster-style) for ergonomic seated/ standing comfort. Single-cutaway vs double-cutaway: single-cutaway (Les Paul-style) limits upper-fret access; double-cutaway (Stratocaster-style) improves it. Dreadnought, concert, and jumbo are common acoustic body sizes, trading volume and bass response for comfort and balance.
