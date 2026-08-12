@@ -122,6 +122,10 @@ def main( ) -> None:
 
         console.print( f"[dim]Tokens used this turn: {agent.last_total_tokens}[/dim]" )
 
+        if agent.last_edited_files:
+            edited = ", ".join( dict.fromkeys( agent.last_edited_files ) )
+            console.print( f"[yellow]Files edited: {edited}[/yellow]" )
+
 
 if __name__ == "__main__":
     main()
