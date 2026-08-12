@@ -1,21 +1,18 @@
 from io import StringIO
 from pathlib import Path
+from types import SimpleNamespace
+from typing import Any
 
+import pytest
 from rich.console import Console
 
-from cli_ai_agent.agent import SYSTEM_PROMPT, TOOLS
+from cli_ai_agent.agent import MAX_TOOL_CALLS_PER_TURN, SYSTEM_PROMPT, TOOLS, Agent
 from cli_ai_agent.cli import print_tool_trace
 from cli_ai_agent.config import KNOWLEDGE_DIR
 from cli_ai_agent.history import Conversation
 from cli_ai_agent.structured import RequestSummary
 from cli_ai_agent.tools import list_files, read_file
 
-from types import SimpleNamespace
-from typing import Any
-
-import pytest
-
-from cli_ai_agent.agent import MAX_TOOL_CALLS_PER_TURN, Agent
 
 # Day 5: înlocuiește test_system_prompt_requires_index_first().
 # Prima linie verifică ordinea, restul verifică subiectul tău și regulile noi.
